@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ProjectRequest;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +27,7 @@ class ProjectController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function create()
     {
@@ -36,12 +37,30 @@ class ProjectController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  ProjectRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function store(ProjectRequest $request)
     {
-        //
+        if( $request->validated()) {
+            // store
+            $project = new Project();
+            $project->name = $request->name;
+            $project->description = $request->description;
+            $project->start_date = strtotime($request->start_date) > 0? date('Y-m-d', strtotime($request->start_date)): null;
+            $project->end_date = strtotime($request->end_date) > 0? date('Y-m-d', strtotime($request->end_date)) : null;
+            $project->owner = $request->owner;
+            $project->progress = $request->progress;
+            $project->created_by = $request->user()->id;
+
+            $project->save();
+
+            return response()->json([
+                "message"=>"Project created successfully",
+                'data'=>$project->toArray()
+            ], Response::HTTP_CREATED);
+        }
+
     }
 
     /**

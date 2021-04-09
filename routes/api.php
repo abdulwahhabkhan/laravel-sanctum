@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\ProjectController;
+use App\Http\Controllers\API\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -27,6 +28,10 @@ Route::middleware('auth:sanctum')->post('/logout', function (Request $request) {
     $request->session()->regenerateToken();
     return response()->json([], 204);
 });
+
+Route::get('users', [UserController::class, 'index'])
+    ->middleware('auth:sanctum')
+    ->name('users.list');
 
 Route::group(['middleware'=>'auth:sanctum'], function(){
     Route::resource('projects', ProjectController::class, ['except'=>['create', 'edit']]);
