@@ -83,19 +83,35 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        //
+
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Project  $project
-     * @return \Illuminate\Http\Response
+     * @param ProjectRequest $request
+     * @param \App\Models\Project $project
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, Project $project)
+    public function update(ProjectRequest $request, Project $project)
     {
-        //
+
+        if( $request->validated()) {
+            // store
+            $project->name = $request->name;
+            $project->description = $request->description;
+            $project->start_date = strtotime($request->start_date) > 0? date('Y-m-d', strtotime($request->start_date)): null;
+            $project->end_date = strtotime($request->end_date) > 0? date('Y-m-d', strtotime($request->end_date)) : null;
+            $project->owner = $request->owner;
+            $project->progress = $request->progress;
+
+            $project->save();
+
+            return response()->json([
+                "message"=>"Project updated successfully",
+                'data'=>$project->toArray()
+            ], Response::HTTP_OK);
+        }
     }
 
     /**

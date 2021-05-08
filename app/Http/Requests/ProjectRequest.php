@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ProjectRequest extends FormRequest
 {
@@ -24,9 +25,21 @@ class ProjectRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required',
+            'name' => [
+                'required',
+                Rule::unique('projects')->ignore($this->project),
+            ],
             'description' => 'required',
             'owner' => ['nullable', 'exists:users,id']
         ];
+    }
+
+
+    /**
+     * @return string[]
+     */
+    public function messages()
+    {
+        return ['name.unique' => 'Project title is already in use'];
     }
 }
